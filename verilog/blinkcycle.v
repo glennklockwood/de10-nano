@@ -2,8 +2,9 @@
  * blinkcycle - cycle through LEDs 0-7
  */
 
-module blinkcycle(clk, LED);
+module blinkcycle(clk, sw3, LED);
     input wire clk;
+    input wire sw3;
     output wire LED[7:0];
     reg [31:0] cnt;
     reg [2:0] state;
@@ -15,8 +16,16 @@ module blinkcycle(clk, LED);
 
     always @(posedge clk) begin
         cnt <= cnt + 1;
-        /* increment state by 1 when the lower 23 bits of cnt are all 1 */
-        state <= state + &(cnt[22:0] & ~23'h0);
+        if (sw3 == 1)
+            begin
+            /* increment state by 1 when the lower 23 bits of cnt are all 1 */
+            state <= state + &(cnt[22:0] & ~23'h0);
+            end
+        else
+            begin
+            state <= state - &(cnt[22:0] & ~23'h0);
+            end
+
     end
 
     assign LED[0] = &(3'd7 == state);
