@@ -3,9 +3,9 @@
  */
 
 module blinkcycle(clk, sw3, LED);
-    input wire clk;
-    input wire sw3;
-    output wire LED[7:0];
+    input wire clk;       /* 50 MHz clock */
+    input wire sw3;       /* slide switch #3 toggles forward/reverse iteration */
+    output wire LED[7:0]; /* eight output LEDs */
     reg [31:0] cnt;
     reg [2:0] state;
 
@@ -15,17 +15,14 @@ module blinkcycle(clk, sw3, LED);
     end
 
     always @(posedge clk) begin
-        cnt <= cnt + 1;
-        if (sw3 == 1)
-            begin
-            /* increment state by 1 when the lower 23 bits of cnt are all 1 */
+        cnt = cnt + 1'b1;
+        /* increment state by 1 when the lower 23 bits of cnt are all 1 */
+        if (sw3 & 1'b1) begin
             state <= state + &(cnt[22:0] & ~23'h0);
-            end
-        else
-            begin
+        /* decrement state if sw3 is off */
+        end else begin
             state <= state - &(cnt[22:0] & ~23'h0);
-            end
-
+        end
     end
 
     assign LED[0] = &(3'd7 == state);
